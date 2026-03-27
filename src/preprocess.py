@@ -4,8 +4,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import torch # type: ignore
 
+from src.config import DATA_PATH, TEST_SIZE, RANDOM_SEED
+
 # FUNCION DE PREPROCESADO
-def load_and_preprocess_data(path="data/insurance.csv"):
+def load_and_preprocess_data(path=DATA_PATH):
     df = pd.read_csv(path)
 
     # SEPARAMOS X E y
@@ -19,8 +21,8 @@ def load_and_preprocess_data(path="data/insurance.csv"):
     # DIVIDIMOS LOS DATOS EN TRAIN Y TEST
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
-        test_size=0.2,
-        random_state=42
+        test_size=TEST_SIZE,
+        random_state=RANDOM_SEED
     )
 
     # AHORA VAMOS A ESCALAR LOS DATOS PARA MEDIA=0 Y STD=1
