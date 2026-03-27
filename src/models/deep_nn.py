@@ -2,9 +2,9 @@ import torch.nn as nn
  
 class DeepNN(nn.Module):
     """
-    Deep neural network with 3 hidden layers.
-    Funnel architecture: input → 64 → 32 → 16 → 1
-    Each layer learns more abstract representations.
+    A bit more complex, using 3 hidden layers.
+    It funnels down from 64 to 32 to 16, then finally to the output.
+    Helps the model pick up on more subtle patterns.
     """
     def __init__(self, input_dim):
         super().__init__()
@@ -19,7 +19,7 @@ class DeepNN(nn.Module):
             nn.Linear(32, 16),
             nn.ReLU(),
  
-            nn.Linear(16, 1)  # output: 1 value (regression)
+            nn.Linear(16, 1)  # Final regression output
         )
  
     def forward(self, x):

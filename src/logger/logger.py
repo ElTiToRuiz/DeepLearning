@@ -6,8 +6,8 @@ from src.config.config import RESULTS_DIR
  
 def get_logger(name: str = "insurance_nn") -> logging.Logger:
     """
-    Logger that writes to console (INFO+) and to a file (DEBUG+).
-    The file includes a timestamp to avoid overwriting previous executions.
+    Sets up a logger that talks to the console (vocal) and a file (quiet listener).
+    The file gets a timestamp so we don't overwrite our history.
     """
     os.makedirs(RESULTS_DIR, exist_ok=True)
  
@@ -22,12 +22,12 @@ def get_logger(name: str = "insurance_nn") -> logging.Logger:
         datefmt="%H:%M:%S"
     )
  
-    # CONSOLE — only INFO and above
+    # Console picks up INFO and louder
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
  
-    # FILE — everything, including DEBUG
+    # File catches everything, even the DEBUG whispers
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
@@ -38,5 +38,5 @@ def get_logger(name: str = "insurance_nn") -> logging.Logger:
     return logger
  
  
-# GLOBAL INSTANCE — imported directly with: from src.logger.logger import logger
+# Shared instance so we can just import 'logger' anywhere
 logger = get_logger()

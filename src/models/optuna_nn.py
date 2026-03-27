@@ -2,33 +2,25 @@ import torch.nn as nn
  
 class OptunaNN(nn.Module):
     """
-    Dynamic architecture that builds the network according to the parameters
-    passed by Optuna in each trial. The number of layers, neurons,
-    and dropout_rate vary in each test.
+    This class is dynamic. It builds the layers based on what 
+    Optuna tells it to do. Every trial might have a different
+    number of layers or neurons.
     """
     def __init__(self, input_dim, hidden_dims, dropout_rate):
         super().__init__()
  
-        # CREATE THE NETWORK
         layers = []
         current_dim = input_dim
  
-        # Iterate through the list of hidden layers chosen by Optuna
+        # Stack layers based on the hidden_dims list
         for hidden_dim in hidden_dims:
-            # LINEAR LAYER
             layers.append(nn.Linear(current_dim, hidden_dim))
- 
-            # RELU
             layers.append(nn.ReLU())
- 
-            # DROPOUT 
-            layers.append(nn.Dropout(dropout_rate))
- 
-            # Update dimension for the next layer
+            layers.append(nn.Dropout(dropout_rate)) # helps prevent overfitting
             current_dim = hidden_dim
  
-        # FINAL OUTPUT LAYER
-        layers.append(nn.Linear(current_dim, 1)) # Single value for regression
+        # Cap it off with the output layer
+        layers.append(nn.Linear(current_dim, 1))
  
         self.network = nn.Sequential(*layers)
  
@@ -36,11 +28,10 @@ class OptunaNN(nn.Module):
         return self.network(x)
  
  
-# FINAL MODEL
 class FinalOptunaNN(nn.Module):
     """
-    Final model built with the best hyperparameters found by Optuna.
-    Instantiated in pipeline.py after tuning with params from study.best_trial.
+    Basically the same as above, but we use this to build the winner
+    once the tuning is over.
     """
     def __init__(self, input_dim, hidden_dims, dropout_rate):
         super().__init__()

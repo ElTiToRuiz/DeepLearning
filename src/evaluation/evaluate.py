@@ -7,38 +7,39 @@ from src.logger.logger import logger
  
 def evaluate_model(model, X_test, y_test, model_name="Model"):
     """
-    Evaluates the model and returns a dict with metrics and prediction arrays
-    to be used in plotting.
+    Run the model on test data and grab all the important metrics.
+    Returns a dict with the results so we can use them for plotting.
     """
     model.eval()
     with torch.no_grad():
         predictions = model(X_test)
  
+    # Flatten everything so numpy doesn't complain
     y_true = y_test.cpu().numpy().flatten()
     y_pred = predictions.cpu().numpy().flatten()
  
-    # ── METRICS ─────────────────────────────────────────────────────────────
- 
+    # Metrics calculation
     mae  = mean_absolute_error(y_true, y_pred)
     mse  = mean_squared_error(y_true, y_pred)
     rmse = np.sqrt(mse)
     r2   = r2_score(y_true, y_pred)
  
-    # MAPE — mean absolute percentage error, easy to communicate
+    # MAPE (percentage error) - always good for business talk
     epsilon = 1e-8
     mape    = np.mean(np.abs((y_true - y_pred) / (y_true + epsilon))) * 100
  
-    # MedAE — median absolute error, robust to extreme outliers
+    # MedAE - median absolute error (ignores outliers better than MAE)
     medae = np.median(np.abs(y_true - y_pred))
  
-    # Max Error — the worst case
+    # Max Error - just to see the worst miss
     max_error = np.max(np.abs(y_true - y_pred))
  
-    # Residuals — used in plot_residuals
+    # Residuals for the error distribution plots
     residuals = y_true - y_pred
  
+    # Log the summary in a nice block
     logger.info(f"\n{'='*40}")
-    logger.info(f"  {model_name} — Results")
+    logger.info(f"  {model_name} - Stats Summary")
     logger.info(f"{'='*40}")
     logger.info(f"  MAE:       {mae:>10.2f} $")
     logger.info(f"  RMSE:      {rmse:>10.2f} $")
@@ -64,11 +65,11 @@ def evaluate_model(model, X_test, y_test, model_name="Model"):
  
 def compare_models(results_dict: dict):
     """
-    Comparative table of several models.
-    Usage: compare_models({"ShallowNN": shallow_results, "DeepNN": deep_results})
+    Little table to compare models side-by-side.
+    Usage: compare_models({"ModelA": resultsA, "ModelB": resultsB})
     """
     logger.info("\n" + "="*60)
-    logger.info("  MODEL COMPARISON")
+    logger.info("  SIDE-BY-SIDE MODEL COMPARISON")
     logger.info("="*60)
     logger.info(f"{'Model':<15} {'MAE':>8} {'RMSE':>8} {'MAPE':>8} {'R²':>8}")
     logger.info("-"*60)

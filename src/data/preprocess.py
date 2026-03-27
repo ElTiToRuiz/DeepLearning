@@ -9,41 +9,41 @@ from src.logger.logger import logger
  
 def load_and_preprocess_data(path=DATA_PATH):
     """
-    Loads the CSV, applies one-hot encoding, scales the features,
-    and returns PyTorch tensors ready for training.
+    Load up the data, do some cleaning, scale everything, 
+    and wrap it in PyTorch tensors so we're ready to train.
     """
-    logger.info(f"Loading data from: {path}")
+    logger.info(f"Grabbing data from {path}...")
     df = pd.read_csv(path)
-    logger.info(f"Dataset loaded | Shape: {df.shape}")
+    logger.info(f"Loaded! Shape: {df.shape}")
  
-    # SEPARATE FEATURES AND TARGET
+    # Grab the target column ('charges') and keep the rest as features (X)
     X = df.drop("charges", axis=1)
     y = df["charges"]
  
-    # ONE-HOT ENCODING — converts text to 0/1 columns
-    # drop_first=True avoids perfect multicollinearity
+    # Switch categorical text strings into dummy columns (0/1)
+    # drop_first=True stops columns from being redundant
     X = pd.get_dummies(X, drop_first=True)
-    logger.debug(f"Features after get_dummies: {list(X.columns)}")
+    logger.debug(f"New column list: {list(X.columns)}")
  
-    # SPLIT 80/20
+    # Standard 80/20 train-test split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=TEST_SIZE,
         random_state=RANDOM_SEED
     )
  
-    # SCALING — mean=0, std=1
-    # fit_transform only on train to avoid data leakage
+    # Scaling everything so we're centered at 0 with 1 std dev.
+    # We only fit on train to avoid cheating (data leakage)!
     scaler  = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test  = scaler.transform(X_test)
  
-    # CONVERT TO TENSORS
+    # Convert everything to float32 tensors for PyTorch
     X_train = torch.tensor(X_train,        dtype=torch.float32)
     X_test  = torch.tensor(X_test,         dtype=torch.float32)
     y_train = torch.tensor(y_train.values, dtype=torch.float32).view(-1, 1)
     y_test  = torch.tensor(y_test.values,  dtype=torch.float32).view(-1, 1)
  
-    logger.info(f"Preprocessing OK | X_train: {X_train.shape} | X_test: {X_test.shape}")
+    logger.info("Preprocessing finished. Tensors are ready.")
  
     return X_train, X_test, y_train, y_test

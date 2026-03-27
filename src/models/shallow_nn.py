@@ -2,24 +2,23 @@ import torch.nn as nn
   
 class ShallowNN(nn.Module):
     """
-    Neural network with a single hidden layer.
-    Architecture: input → 32 → 1
-    Simple, fast, good as a baseline.
+    Very basic setup with just one hidden layer.
+    Input -> 32 nodes -> Output
+    Small and fast, perfect as a starting point.
     """
     def __init__(self, input_dim):
         super().__init__()
  
-        # HIDDEN LAYER: input_dim → 32 neurons
+        # Hidden layer: take input and map to 32 neurons
         self.hidden = nn.Linear(input_dim, 32)
  
-        # ReLU — introduces non-linearity to learn complex patterns
+        # ReLU to keep things non-linear
         self.relu = nn.ReLU()
  
-        # OUTPUT LAYER: 1 neuron for regression (predicting a value)
+        # Just one output node for our price prediction
         self.output = nn.Linear(32, 1)
  
     def forward(self, x):
         x = self.hidden(x)
         x = self.relu(x)
-        x = self.output(x)
-        return x
+        return self.output(x)

@@ -1,6 +1,6 @@
-# Medical Insurance Cost Prediction — Neural Networks with PyTorch
+# Predicting Medical Insurance Costs — Pytorch Neural Networks
 
-A supervised regression project that trains and compares multiple neural network architectures to predict individual medical insurance costs based on demographic and health features. Built with PyTorch, scikit-learn, and Optuna for automated hyperparameter tuning.
+This project is all about using neural networks to predict how much medical insurance is going to cost. We've built and compared a few different architectures using PyTorch and threw in some Optuna for automated hyperparameter tuning to find the best settings.
 
 ---
 
@@ -9,113 +9,105 @@ A supervised regression project that trains and compares multiple neural network
 - **Mikel Sanchez**
 - **Igor Ruiz**
 
-
 ---
 
 ## Project Structure
 
+Here's how we've organized everything:
+
 ```
-proyecto/
+DeepLearning/
 │
-├── main.py                          # Entry point — runs the full pipeline
+├── main.py                          # The entry point to run the whole thing
 │
 ├── data/
-│   └── insurance.csv                # Dataset
+│   └── insurance.csv                # Our dataset
 │
-├── models/                          # Saved model weights (.pth)
-├── results/                         # Saved plots and log files
+├── models/                          # Where we save the trained weights (.pth)
+├── results/                         # Where the plots and logs end up
 │
 └── src/
     ├── __init__.py
-    ├── pipeline.py                  # Orchestrates the full training flow
+    ├── pipeline.py                  # The main script orchestrating everything
     │
     ├── config/
-    │   ├── __init__.py
-    │   └── config.py                # All hyperparameters, paths and set_seeds()
+    │   └── config.py                # All our knobs, paths, and seed settings
     │
     ├── logger/
-    │   ├── __init__.py
-    │   └── logger.py                # Logging to console and timestamped file
+    │   └── logger.py                # Handles console and file logging
     │
     ├── data/
-    │   ├── __init__.py
-    │   └── preprocess.py            # Data loading, encoding, scaling, tensor conversion
+    │   └── preprocess.py            # Clean, encode, and scale the data into tensors
     │
     ├── models/
-    │   ├── __init__.py
-    │   ├── shallow_nn.py            # ShallowNN  — 1 hidden layer (input → 32 → 1)
-    │   ├── deep_nn.py               # DeepNN     — 3 hidden layers (input → 64 → 32 → 16 → 1)
-    │   └── optuna_nn.py             # OptunaNN + FinalOptunaNN — dynamic architecture
+    │   ├── shallow_nn.py            # Basic network (1 hidden layer)
+    │   ├── deep_nn.py               # More complex network (3 layers)
+    │   └── optuna_nn.py             # Dynamic model for the Optuna search
     │
     ├── training/
-    │   ├── __init__.py
-    │   ├── train.py                 # Training loop (forward, backward, optimizer step)
-    │   └── optuna_tuning.py         # Hyperparameter search with Optuna
+    │   ├── train.py                 # The standard training loop logic
+    │   └── optuna_tuning.py         # The logic behind the hyperparameter search
     │
     ├── evaluation/
-    │   ├── __init__.py
-    │   ├── evaluate.py              # Metrics: MAE, RMSE, MedAE, MAPE, R²
-    │   └── plots.py                 # Loss curves, Real vs Predicted, Residual analysis
+    │   ├── evaluate.py              # Calculating MAE, RMSE, R², etc.
+    │   └── plots.py                 # Generating all the pretty charts
     │
     └── utils/
-        ├── __init__.py
-        └── utils.py                 # save_model() and load_model()
+        └── utils.py                 # Simple helpers to save and load models
 ```
 
 ---
 
-## Pipeline
+## How the Pipeline Works
 
-When you run `python main.py`, the following steps execute in order:
+When you fire off `python main.py`, it goes through these steps:
 
-1. **Seeds** — All random seeds are fixed (Python, NumPy, PyTorch) to guarantee full reproducibility.
-2. **Preprocessing** — The CSV is loaded, categorical features are one-hot encoded, data is split 80/20, features are standardized (fit on train only to avoid data leakage), and everything is converted to PyTorch tensors.
-3. **ShallowNN** — A single hidden layer network is trained, saved, evaluated, and plotted.
-4. **DeepNN** — A 3-layer funnel network is trained, saved, evaluated, and plotted.
-5. **Comparison** — ShallowNN and DeepNN are compared side by side in a metrics table.
-6. **Optuna Tuning** — Optuna runs N trials searching for the best combination of number of layers, neurons per layer, learning rate, dropout rate, weight decay, and number of epochs.
-7. **FinalOptunaNN** — A model is built using the best parameters found by Optuna, trained from scratch, saved, and evaluated.
-8. **Final Comparison** — All three models (ShallowNN, DeepNN, FinalOptunaNN) are compared in a single table.
+1.  **Seeds**: We lock all random seeds (Python, NumPy, PyTorch) so the results are actually reproducible.
+2.  **Preprocessing**: Load the CSV, one-hot encode categories, split 80/20, and scale the features. We only "fit" the scaler on the train set to avoid any data leakage.
+3.  **ShallowNN**: Train a basic model with one hidden layer just to see where we stand.
+4.  **DeepNN**: Step it up with a 3-layer network that funnels down from 64 to 16 neurons.
+5.  **Initial Comparison**: See how the Shallow and Deep models stack up against each other.
+6.  **Optuna Tuning**: Let Optuna run 20 trials to hunt down the best depth, width, learning rate, and dropout settings.
+7.  **Final Trial**: Take the absolute best parameters found by Optuna and train one last "Final" model.
+8.  **Final Comparison**: One last table to compare all three approaches (Shallow, Deep, and the Optuna winner).
 
 ---
 
-## Installation
+## Setup
 
-This project uses [uv](https://github.com/astral-sh/uv) for dependency management.
+We used [uv](https://github.com/astral-sh/uv) to manage dependencies.
 
 ```bash
-# Clone the repository
+# Clone the repo
 git clone <repo-url>
-cd proyecto
+cd DeepLearning
 
-# Install dependencies
+# Install the goods
 uv pip install -r requirements.txt
 ```
 
 ### Requirements
 
-```
-torch
-pandas
-scikit-learn
-matplotlib
-scipy
-optuna
-numpy
-```
+- `torch`
+- `pandas`
+- `scikit-learn`
+- `matplotlib`
+- `scipy`
+- `optuna`
+- `numpy`
 
 ---
 
-## Usage
+## Running It
 
 ```bash
 python main.py
 ```
 
-Trained model weights are saved to `models/`. All plots and log files are saved to `results/`. Each run generates a new timestamped log file so previous runs are never overwritten.
+Weights go into `models/`, and your charts and logs land in `results/`. Every time you run it, a new timestamped log is created so you won't lose your previous results.
 
 ---
 
-## Reproducibility
+## Consistency
 
-All random seeds are fixed at the start of every run via `set_seeds()` in `config.py`. This covers Python's `random` module, NumPy, and PyTorch (both CPU and GPU). Running `python main.py` will always produce the same results.
+Since we fixed the seeds in `config.py`, you should get the same results every single time you run `python main.py`. No magic, just reproducible math.

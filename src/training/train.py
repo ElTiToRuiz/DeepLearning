@@ -8,14 +8,14 @@ from src.logger.logger import logger
 def train_model(model, X_train, y_train, X_test, y_test,
                 epochs=200, lr=0.01, weight_decay=0.0):
     """
-    Standard training loop with Adam and MSELoss.
-    Returns lists of train and test losses for plotting.
+    Main training loop. Gets the model ready, runs epochs,
+    and grabs the losses so we can plot them later.
     """
-    # MSELoss — standard loss function for regression
+    # Stick with MSE for regression
     criterion = nn.MSELoss()
  
-    # Adam — adjusts lr using 1st and 2nd order moments
-    # weight_decay adds L2 regularization if not 0
+    # Opting for Adam because it's usually reliable
+    # weight_decay adds some L2 to keep it from overfitting
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
  
     train_losses = []
@@ -23,25 +23,27 @@ def train_model(model, X_train, y_train, X_test, y_test,
  
     for epoch in range(epochs):
  
-        # ── TRAINING ──────────────────────────────────────────────────────
+        # -- Step 1: Training Mode --
         model.train()
  
         predictions = model(X_train)
         train_loss  = criterion(predictions, y_train)
  
-        optimizer.zero_grad()   # clear accumulated gradients
-        train_loss.backward()   # compute gradients (backprop)
-        optimizer.step()        # update weights
+        optimizer.zero_grad()   # Get rid of old gradients
+        train_loss.backward()   # Backprop time
+        optimizer.step()        # Update the weights
  
-        # ── EVALUATION ON TEST ───────────────────────────────────────────
+        # -- Step 2: Evaluation Mode --
         model.eval()
-        with torch.no_grad():   # deactivate gradients, just predict
+        with torch.no_grad():   # No need to track grads here
             test_predictions = model(X_test)
             test_loss        = criterion(test_predictions, y_test)
  
+        # Keep track of the progress
         train_losses.append(train_loss.item())
         test_losses.append(test_loss.item())
  
+        # Print a status update every 20 epochs
         if (epoch + 1) % 20 == 0:
             logger.info(
                 f"Epoch [{epoch+1}/{epochs}] | "
