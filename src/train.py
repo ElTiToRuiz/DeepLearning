@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-def train_model(model, X_train, y_train, X_test, y_test, epochs=200, lr=0.01):
+def train_model(model, X_train, y_train, X_test, y_test, epochs=200, lr=0.01, weight_decay=0.0):
     
     # FUNCION DE PERDIDA Y USAMOS MSELOSS YA QUE ES UN PROBLEMA DE REGRESSION
     criterion = nn.MSELoss()
     
     # ADAM ACTUALIZA LOS PESOS UTILIZANDO EL GRADIENTE
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     
     # LISTAS PARA GUARDAR LA EVOLUVION DEL LOSS
     train_losses = []
@@ -18,7 +18,6 @@ def train_model(model, X_train, y_train, X_test, y_test, epochs=200, lr=0.01):
     # BUCLE PRINCIPAL
     for epoch in range(epochs):
         
-   
         model.train()
         
         # FORWARD PASS
