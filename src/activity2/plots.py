@@ -1,9 +1,30 @@
 import os
+import random
 from typing import Sequence
 
 import numpy as np
 import matplotlib.pyplot as plt
+import torch
 from sklearn.metrics import confusion_matrix
+
+
+def sample_test_predictions(model, test_dataset, device,
+                            n_samples: int = 16, seed: int = 42):
+    """
+    Pick N random samples from `test_dataset`, run them through `model`, and
+    return (images_on_device, true_labels_np, predicted_labels_np) ready to
+    feed into `plot_sample_predictions`.
+    """
+    rng = random.Random(seed)
+    indices = rng.sample(range(len(test_dataset)), min(n_samples, len(test_dataset)))
+    items   = [test_dataset[i] for i in indices]
+    images  = torch.stack([item[0] for item in items]).to(device)
+    labels  = np.array([item[1] for item in items])
+
+    model.eval()
+    with torch.no_grad():
+        preds = model(images).argmax(dim=1).cpu().numpy()
+    return images, labels, preds
 
 
 def plot_history(history: dict, model_name: str, results_dir: str):
@@ -42,7 +63,8 @@ def plot_confusion_matrix(y_true: Sequence[int], y_pred: Sequence[int],
                           class_names: Sequence[str], model_name: str,
                           results_dir: str, normalize: bool = False):
     """
-    Confusion matrix heatmap. With `normalize=True` it shows percentages.
+    Confusion matrix heatmap. With `normalize=True` it shows row-normalized
+    percentages (per true class) and saves to a `_norm.png` file.
     """
     cm = confusion_matrix(y_true, y_pred)
     if normalize:
@@ -58,7 +80,9 @@ def plot_confusion_matrix(y_true: Sequence[int], y_pred: Sequence[int],
     ax.set_yticklabels(class_names)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("True")
-    ax.set_title(f"{model_name} — Confusion Matrix", fontweight="bold")
+    title_suffix = " (normalized %)" if normalize else ""
+    ax.set_title(f"{model_name} — Confusion Matrix{title_suffix}",
+                 fontweight="bold")
 
     fmt = ".1f" if normalize else "d"
     threshold = cm.max() / 2.0
@@ -71,7 +95,8 @@ def plot_confusion_matrix(y_true: Sequence[int], y_pred: Sequence[int],
 
     os.makedirs(results_dir, exist_ok=True)
     plt.tight_layout()
-    plt.savefig(os.path.join(results_dir, f"{model_name}_confusion.png"),
+    suffix = "_norm" if normalize else ""
+    plt.savefig(os.path.join(results_dir, f"{model_name}_confusion{suffix}.png"),
                 dpi=150, bbox_inches="tight")
     plt.close(fig)
 

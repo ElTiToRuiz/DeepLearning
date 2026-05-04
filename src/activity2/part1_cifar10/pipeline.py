@@ -19,7 +19,10 @@ from src.activity2.config import (
     RANDOM_SEED, get_device,
 )
 from src.activity2.train import fit, evaluate
-from src.activity2.plots import plot_history, plot_confusion_matrix
+from src.activity2.plots import (
+    plot_history, plot_confusion_matrix, plot_sample_predictions,
+    sample_test_predictions,
+)
 from src.activity2.part1_cifar10.model import AlexNet
 
 
@@ -146,6 +149,19 @@ def run():
         plot_history(history, "AlexNet_CIFAR10", RESULTS_DIR)
     plot_confusion_matrix(labels, preds, CIFAR10_CLASSES,
                           "AlexNet_CIFAR10", RESULTS_DIR)
+    plot_confusion_matrix(labels, preds, CIFAR10_CLASSES,
+                          "AlexNet_CIFAR10", RESULTS_DIR, normalize=True)
+
+    # Random sample grid: shows actual images with true vs predicted labels.
+    sample_imgs, sample_true, sample_pred = sample_test_predictions(
+        model, test_loader.dataset, device, n_samples=16,
+    )
+    plot_sample_predictions(
+        sample_imgs, sample_true, sample_pred,
+        class_names=CIFAR10_CLASSES, model_name="AlexNet_CIFAR10",
+        results_dir=RESULTS_DIR, n_samples=16,
+        mean=CIFAR10_MEAN, std=CIFAR10_STD,
+    )
 
     logger.info("Part 1 finished.")
     return history, test_acc

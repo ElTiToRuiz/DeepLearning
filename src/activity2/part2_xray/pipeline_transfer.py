@@ -15,8 +15,13 @@ from src.activity2.config import (
     RANDOM_SEED, get_device,
 )
 from src.activity2.train import fit, evaluate
-from src.activity2.plots import plot_history, plot_confusion_matrix
-from src.activity2.part2_xray.dataset import get_dataloaders, download_xray_dataset
+from src.activity2.plots import (
+    plot_history, plot_confusion_matrix, plot_sample_predictions,
+    sample_test_predictions,
+)
+from src.activity2.part2_xray.dataset import (
+    get_dataloaders, download_xray_dataset, IMAGENET_MEAN, IMAGENET_STD,
+)
 from src.activity2.part2_xray.models.resnet18_transfer import (
     build_resnet18_transfer, count_params,
 )
@@ -86,5 +91,17 @@ def run():
         plot_history(history, "ResNet18_Transfer_XRay", RESULTS_DIR)
     plot_confusion_matrix(labels, preds, classes,
                           "ResNet18_Transfer_XRay", RESULTS_DIR)
+    plot_confusion_matrix(labels, preds, classes,
+                          "ResNet18_Transfer_XRay", RESULTS_DIR, normalize=True)
+
+    sample_imgs, sample_true, sample_pred = sample_test_predictions(
+        model, test_loader.dataset, device, n_samples=16,
+    )
+    plot_sample_predictions(
+        sample_imgs, sample_true, sample_pred,
+        class_names=classes, model_name="ResNet18_Transfer_XRay",
+        results_dir=RESULTS_DIR, n_samples=16,
+        mean=IMAGENET_MEAN, std=IMAGENET_STD,
+    )
 
     return history, test_acc
