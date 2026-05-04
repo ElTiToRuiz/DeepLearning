@@ -32,3 +32,7 @@ src/activity2/dataset/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local-only artefacts (kept out of the repo on purpose)
+scripts/
+presentation/
