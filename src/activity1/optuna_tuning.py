@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
  
-from src.models.optuna_nn import OptunaNN
-from src.logger.logger import logger
+from src.activity1.models.optuna_nn import OptunaNN
+from src.shared.logger import logger
  
 # Turn down Optuna's noise since we'll use our own logger for the important bits
 optuna.logging.set_verbosity(optuna.logging.WARNING)

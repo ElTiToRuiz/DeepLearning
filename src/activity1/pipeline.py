@@ -1,19 +1,21 @@
-from src.config.config import set_seeds, EPOCHS, LEARNING_RATE, OPTUNA_TRIALS
-from src.logger.logger import logger
-from src.data.preprocess import load_and_preprocess_data
-from src.models.shallow_nn import ShallowNN
-from src.models.deep_nn import DeepNN
-from src.models.optuna_nn import FinalOptunaNN
-from src.training.train import train_model
-from src.training.optuna_tuning import tune_with_optuna
-from src.evaluation.evaluate import evaluate_model, compare_models
-from src.evaluation.plots import plot_losses, plot_predictions, plot_residuals
-from src.utils.utils import save_model
+from src.shared.seeds import set_seeds
+from src.shared.logger import setup_logger
+from src.shared.utils import save_model
+from src.activity1.config import EPOCHS, LEARNING_RATE, OPTUNA_TRIALS, MODELS_DIR, RESULTS_DIR, RANDOM_SEED
+from src.activity1.preprocess import load_and_preprocess_data
+from src.activity1.models.shallow_nn import ShallowNN
+from src.activity1.models.deep_nn import DeepNN
+from src.activity1.models.optuna_nn import FinalOptunaNN
+from src.activity1.train import train_model
+from src.activity1.optuna_tuning import tune_with_optuna
+from src.activity1.evaluate import evaluate_model, compare_models
+from src.activity1.plots import plot_losses, plot_predictions, plot_residuals
 
 
 def run():
-    # 1. Start by fixing the seeds
-    set_seeds()
+    # 1. Configure logger and fix the seeds
+    logger = setup_logger(RESULTS_DIR)
+    set_seeds(RANDOM_SEED)
 
     # 2. Get the data ready
     X_train, X_test, y_train, y_test = load_and_preprocess_data()
@@ -26,7 +28,7 @@ def run():
         shallow_model, X_train, y_train, X_test, y_test,
         epochs=EPOCHS, lr=LEARNING_RATE
     )
-    save_model(shallow_model, "shallow_nn")
+    save_model(shallow_model, "shallow_nn", MODELS_DIR)
     shallow_results = evaluate_model(shallow_model, X_test, y_test, "ShallowNN")
 
     plot_losses(shallow_train_losses, shallow_test_losses, "ShallowNN")
@@ -40,7 +42,7 @@ def run():
         deep_model, X_train, y_train, X_test, y_test,
         epochs=EPOCHS, lr=LEARNING_RATE
     )
-    save_model(deep_model, "deep_nn")
+    save_model(deep_model, "deep_nn", MODELS_DIR)
     deep_results = evaluate_model(deep_model, X_test, y_test, "DeepNN")
 
     plot_losses(deep_train_losses, deep_test_losses, "DeepNN")
@@ -80,7 +82,7 @@ def run():
         lr=best["lr"],
         weight_decay=best["weight_decay"]
     )
-    save_model(final_model, "final_optuna_nn")
+    save_model(final_model, "final_optuna_nn", MODELS_DIR)
     final_results = evaluate_model(final_model, X_test, y_test, "FinalOptunaNN")
 
     plot_losses(final_train_losses, final_test_losses, "FinalOptunaNN")

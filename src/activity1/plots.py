@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from scipy import stats
  
-from src.config.config import RESULTS_DIR
+from src.activity1.config import RESULTS_DIR
  
  
 # ------------------------------------------------------------------------------

@@ -3,8 +3,8 @@ import torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
  
-from src.config.config import DATA_PATH, TEST_SIZE, RANDOM_SEED
-from src.logger.logger import logger
+from src.activity1.config import DATA_PATH, TEST_SIZE, RANDOM_SEED
+from src.shared.logger import logger
  
  
 def load_and_preprocess_data(path=DATA_PATH):
@@ -31,7 +31,8 @@ def load_and_preprocess_data(path=DATA_PATH):
         test_size=TEST_SIZE,
         random_state=RANDOM_SEED
     )
- 
+    # add validation
+
     # Scaling everything so we're centered at 0 with 1 std dev.
     # We only fit on train to avoid cheating (data leakage)!
     scaler  = StandardScaler()

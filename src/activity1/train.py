@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
  
-from src.logger.logger import logger
+from src.shared.logger import logger
  
  
 def train_model(model, X_train, y_train, X_test, y_test,

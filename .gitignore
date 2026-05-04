@@ -11,13 +11,13 @@ env/
 # uv
 .uv/
 
-# Modelos entrenados (carpeta raíz, NO src/models que es código)
-/models/*
-!/models/.gitkeep
+# Modelos entrenados (artefactos por actividad, no el código)
+src/activity*/checkpoints/*
+!src/activity*/checkpoints/.gitkeep
 
-# Resultados generados
-/results/*
-!/results/.gitkeep
+# Resultados generados (gráficos, logs)
+src/activity*/results/*
+!src/activity*/results/.gitkeep
 
 # Jupyter
 .ipynb_checkpoints/
@@ -33,4 +33,5 @@ Thumbs.db
 # Logs
 *.log
 
+results/
 
