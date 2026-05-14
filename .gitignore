@@ -13,6 +13,12 @@ env/
 
 # Trained checkpoints: tracked via Git LFS (see .gitattributes), not ignored.
 
+# Activity 3 keeps results/plots and README local only.
+# Checkpoints DO get committed (via LFS for .pth, plain for .joblib) so the
+# pipeline can be reproduced with SKIP_TRAINING=1 without retraining.
+src/activity3/results/*.png
+src/activity3/README.md
+
 # Generated results: keep .png plots in git, ignore noisy timestamped logs.
 src/activity*/results/*.log
 
@@ -20,7 +26,9 @@ src/activity*/results/*.log
 # Activity 1 keeps insurance.csv versioned under src/activity1/dataset/.
 # Activity 2 uses kagglehub (cached in ~/.cache/kagglehub) and torchvision
 # (cached in src/activity2/dataset/cifar10/).
+# Activity 3 caches yfinance prices and Kaggle tweets locally.
 src/activity2/dataset/
+src/activity3/dataset/
 
 # Jupyter
 .ipynb_checkpoints/
